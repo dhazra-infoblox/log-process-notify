@@ -2,11 +2,11 @@ package logging;
 
 import lombok.Getter;
 import lombok.Setter;
+import notify.Topic;
 
 import java.util.Queue;
 
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 public class LogObj {
     private LogType logType;
@@ -14,9 +14,12 @@ public class LogObj {
     private @Getter int frequency;
     private Queue<Long> timeStamps;
 
-    public LogObj(LogType lt, Config c) {
+    private Topic topic;
+
+    public LogObj(LogType lt, Config c, Topic topic) {
         this.logType = lt;
         this.config = c;
+        this.topic = topic;
         this.frequency = 0;
         this.timeStamps = new PriorityQueue<>(
                 (n1, n2) -> (int) (n1 - n2)); // init heap 'the old timestamp first'
@@ -25,10 +28,13 @@ public class LogObj {
     public void push(Long timeStamp) {
         this.timeStamps.add(timeStamp);
         if(timeStamps.size() > config.getFrequency()) {
+            if(timeStamp - config.getDuration() <= peekOldest()) {
+                System.out.println(logType + " time: " + timeStamp + " head: " + peekOldest());
+                sendEvent(timeStamp);
+            }
             timeStamps.poll();
-        } else {
-            this.frequency++;
         }
+        this.frequency++;
     }
 
     public Long peekOldest() {
@@ -38,5 +44,15 @@ public class LogObj {
     public void flush() {
         this.frequency = 0;
         this.timeStamps.clear();
+    }
+
+    public void sendEvent(Long timeStamp) {
+        if (this.topic.isNotifiable(config.getWaitTime(), timeStamp)) {
+            this.topic.setLastTimeNotified(timeStamp);
+            this.topic.notifyUsers();
+            flush();
+        } else {
+            System.out.println("WaitTime not over");
+        }
     }
 }
