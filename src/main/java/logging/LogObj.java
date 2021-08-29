@@ -1,13 +1,16 @@
 package logging;
 
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Queue;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class LogObj {
     private LogType logType;
-    private Config config;
+    private @Setter Config config;
     private @Getter int frequency;
     private Queue<Long> timeStamps;
 
