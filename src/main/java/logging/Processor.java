@@ -1,5 +1,5 @@
 package logging;
 
-public interface LogStream {
+public interface Processor {
     void process();
 }

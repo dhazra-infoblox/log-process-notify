@@ -9,7 +9,7 @@ public class Topic {
     private static final AtomicInteger count = new AtomicInteger(0);
     private final int id;
     private List<User> subscribers;
-    private @Setter long lastTimeNotified;
+    private long lastTimeNotified;
 
     public Topic(List<User> subscribers) {
         this.id = count.incrementAndGet();
@@ -21,10 +21,11 @@ public class Topic {
         return timeStamp - lastTimeNotified >= waitTime;
     }
 
-    public void notifyUsers() {
+    public void notifyUsers(Message message) {
+        this.lastTimeNotified = message.getTimeStamp();
         System.out.println("Topic " + id + " will notify its Users at " + this.lastTimeNotified);
         for (User user : this.subscribers) {
-            user.sendMail();
+            user.sendMail(message);
         }
         try {
             Thread.sleep(50);

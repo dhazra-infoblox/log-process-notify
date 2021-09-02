@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class User {
     private final String name;
-    private @Generated String id;
+    private String id;
 
-    public void sendMail() {
-        System.out.println("Mail sent to " + this.name);
+    public void sendMail(Message message) {
+        System.out.println("Mail " + message.toString() + " sent to " + this.name);
     }
 }
